@@ -21,6 +21,8 @@ export default function SignUpScreen({ navigation }) {
   const [errorText, setErrorText] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const formType = "Sign up";
+
   async function signUp() {
     console.log("---- Signup Time -----");
     Keyboard.dismiss();
@@ -45,85 +47,13 @@ export default function SignUpScreen({ navigation }) {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Sign up to blog</Text>
-        <Text style={styles.fieldTitle}>Username</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={username}
-          onChangeText={(input) => setUsername(input)}
-        />
-        <Text style={styles.fieldTitle}>Password</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          autoCompleteType="password"
-          autoCorrect={false}
-          secureTextEntry={true}
-          value={password}
-          onChangeText={(input) => setPassword(input)}
-        />
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-            onPress={signUp}
-            style={styles.loginButton}
-          >
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
-          {loading ? (
-            <ActivityIndicator style={{ marginLeft: 20, marginBottom: 20 }} />
-          ) : null}
-        </View>
-        <Text style={styles.errorText}>{errorText}</Text>
-        <View style={{ height: 20, alignItems: "left" }}></View>
-        <Button title="Sign in instead" onPress={() => navigation.navigate("SignIn")} />
-      </View>
-    </TouchableWithoutFeedback>
+    <AuthForm 
+      username={username}
+      password={password}
+      errorText={errorText}
+      loading={loading}
+      formType={formType}
+      signUp={signUp}
+    />
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    marginBottom: 24,
-  },
-  fieldTitle: {
-    fontSize: 18,
-    marginBottom: 12,
-  },
-  input: {
-    borderColor: "#999",
-    borderWidth: 1,
-    marginBottom: 24,
-    padding: 4,
-    height: 36,
-    fontSize: 18,
-    backgroundColor: "white",
-  },
-  loginButton: {
-    backgroundColor: "blue",
-    width: 120,
-    alignItems: "center",
-    padding: 18,
-    marginTop: 12,
-    marginBottom: 36,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-  errorText: {
-    color: "red",
-    height: 40,
-  },
-});
+}
