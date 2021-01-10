@@ -3,11 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Context } from "../context/BlogContext";
 import { EvilIcons } from "@expo/vector-icons";
 
-const ShowScreen = ({ navigation }) => {
+const ShowScreen = ({ navigation, route }) => {
   const { state } = useContext(Context);
 
   const blogPost = state.find(
-    (blogPost) => blogPost.id === navigation.getParam("id")
+    (blogPost) => blogPost.id === route.params.id
   );
 
   return (

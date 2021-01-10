@@ -35,7 +35,7 @@ export default function SignInScreen({ navigation }) {
       setLoading(false);
 
       console.log(AsyncStorage.getItem("token"));
-      navigation.navigate("Account");
+      navigation.navigate("Index");
     } catch (error) {
       setLoading(false);
       console.log("Error logging in!");
