@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ActivityIndicator, Button, StyleSheet, Text, View } from "react-native";
 import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-
-const API = "https://amirulraziqi.pythonanywhere.com";
-const API_WHOAMI = "/whoami";
+import blog from "../api/blog";
 
 export default function AccountScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -16,7 +13,7 @@ export default function AccountScreen({ navigation }) {
     console.log(`Token is ${token}`);
 
     try {
-      const response = await axios.get(API + API_WHOAMI, { 
+      const response = await blog.get("/whoami", { 
         headers: { Authorization: `JWT ${token}` }
       });
       console.log("Got username!");

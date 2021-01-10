@@ -5,16 +5,15 @@ import {
   Text,
   TextInput,
   StyleSheet,
+  Button,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-
-const API = "https://amirulraziqi.pythonanywhere.com";
-const API_LOGIN = "/auth";
+import blog from "../api/blog";
+import AuthForm from "../components/AuthForm";
 
 export default function SignInScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -22,13 +21,14 @@ export default function SignInScreen({ navigation }) {
   const [errorText, setErrorText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function login() {
+  console.log(navigation);
+  async function signIn() {
     console.log("---- Login Time -----");
     Keyboard.dismiss();
 
     try {
       setLoading(true);
-      const response = await axios.post(API + API_LOGIN, { username, password });
+      const response = await blog.post("/auth", { username, password });
       console.log("Success logging in!");
 
       await AsyncStorage.setItem("token", response.data.access_token);
@@ -41,9 +41,8 @@ export default function SignInScreen({ navigation }) {
       console.log("Error logging in!");
       console.log(error.response);
 
-      setErrorText(error.response.data.description)
+      setErrorText(error.response.data.description);
     }
-
   }
 
   return (
@@ -68,21 +67,24 @@ export default function SignInScreen({ navigation }) {
           value={password}
           onChangeText={(input) => setPassword(input)}
         />
-        <View style = {{ flexDirection: "row"}}>
-          <TouchableOpacity onPress={login} style={styles.loginButton}>
-            <Text style={styles.buttonText}>Log in</Text>
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            onPress={signIn}
+            style={styles.loginButton}
+          >
+            <Text style={styles.buttonText}>Sign in</Text>
           </TouchableOpacity>
-            {loading 
-            ? (
-              <ActivityIndicator style={{ marginLeft: 20, marginBottom: 20 }}/>
-            ) : null}
+          {loading ? (
+            <ActivityIndicator style={{ marginLeft: 20, marginBottom: 20 }} />
+          ) : null}
         </View>
         <Text style={styles.errorText}>{errorText}</Text>
         <View style={{ height: 20, alignItems: "left" }}></View>
+        <Button title="Sign up here" onPress={() => navigation.navigate("SignUp")} />
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

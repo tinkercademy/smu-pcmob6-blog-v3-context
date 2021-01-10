@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EvilIcons } from "@expo/vector-icons";
 
 import SignInScreen from "./src/screens/SignInScreen";
+import SignUpScreen from "./src/screens/SignUpScreen";
 import AccountScreen from "./src/screens/AccountScreen";
 import IndexScreen from "./src/screens/IndexScreen";
 import ShowScreen from "./src/screens/ShowScreen";
@@ -64,6 +65,7 @@ export default function App() {
         >
           <Stack.Screen component={AccountScreen} name="Account" />
           <Stack.Screen component={SignInScreen} name="SignIn" />
+          <Stack.Screen component={SignUpScreen} name="SignUp" />
           <Stack.Screen
             component={IndexScreen}
             name="Index"
@@ -85,9 +87,11 @@ export default function App() {
               headerRight: () => (
                 <TouchableOpacity
                   style={{ marginRight: 15 }}
-                  onPress={() => navigationRef.current.navigate("Edit")}
+                  onPress={() => {
+                    navigationRef.current.navigate("Edit", { id: navigationRef.current.getCurrentRoute().params.id })
+                  }}
                 >
-                  <EvilIcons name="plus" size={35} color="white" />
+                  <EvilIcons name="pencil" size={35} color="white" />
                 </TouchableOpacity>
               ),
             }}

@@ -10,31 +10,28 @@ import { Context } from "../context/BlogContext";
 import { EvilIcons } from "@expo/vector-icons";
 import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-
-const API = "https://amirulraziqi.pythonanywhere.com";
-const API_WHOAMI = "/whoami";
+import blog from "../api/blog";
 
 const IndexScreen = ({ navigation }) => {
   const { state, deleteBlogPost } = useContext(Context); // access BlogContext object
   const [username, setUsername] = useState("");
 
-  console.log(navigation)
   async function getUsername() {
     console.log("----- Getting Username -----");
     const token = await AsyncStorage.getItem("token");
     console.log(`Token is ${token}`);
 
     try {
-      const response = await axios.get(API + API_WHOAMI, { 
+      const response = await blog.get("/whoami", { 
         headers: { Authorization: `JWT ${token}` }
       });
       console.log("Got username!");
-      await setUsername(response.data.username)
-      console.log(`Username is ${username}`);
 
+      setUsername(response.data.username);
+      console.log(`Username is ${username}`);
     } catch (error) {
       console.log("Error getting username!");
+
       if (error.response) {
         console.log(error.response.data);
         (error.response.data.status_code === 401) ? signOut() : null ;
@@ -56,6 +53,11 @@ const IndexScreen = ({ navigation }) => {
     getUsername();
     return removeListener;
   }, []);
+
+  function signOut() {
+    AsyncStorage.removeItem("token");
+    navigation.navigate("SignIn");
+  }
 
   return (
     <View>
@@ -85,6 +87,9 @@ const IndexScreen = ({ navigation }) => {
           );
         }}
       />
+      <TouchableOpacity onPress={signOut} style={{ alignSelf: "center" }}>
+        <Text>Sign Out</Text>
+      </TouchableOpacity>
     </View>
   );
 };
