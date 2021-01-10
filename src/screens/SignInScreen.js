@@ -13,7 +13,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const API = "https://amirulraziqi.pythonanywhere.com";
-
 const API_LOGIN = "/auth";
 
 export default function SignInScreen({ navigation }) {
@@ -28,9 +27,9 @@ export default function SignInScreen({ navigation }) {
     try {
       const response = await axios.post(API + API_LOGIN, { username, password });
       console.log("Success logging in!");
-      console.log(response);
 
-      AsyncStorage.setItem("token", response.data.access_token);
+      await AsyncStorage.setItem("token", response.data.access_token);
+      console.log(AsyncStorage.getItem("token"));
       navigation.navigate("Account");
     } catch (error) {
       console.log("Error logging in!");
