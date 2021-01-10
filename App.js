@@ -19,7 +19,7 @@ import ShowScreen from "./src/screens/ShowScreen";
 import CreateScreen from "./src/screens/CreateScreen";
 import EditScreen from "./src/screens/EditScreen";
 import { Provider } from "./src/context/BlogContext";
-import { navigationRef } from './navigation/RootNavigation';
+import { navigationRef } from "./navigation/RootNavigation";
 
 const Stack = createStackNavigator();
 
@@ -69,13 +69,29 @@ export default function App() {
             name="Index"
             options={{
               headerRight: () => (
-                <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigationRef.current.navigate("Create")}>
-                  <EvilIcons name="plus" size={35} color="white"/>
+                <TouchableOpacity
+                  style={{ marginRight: 15 }}
+                  onPress={() => navigationRef.current.navigate("Create")}
+                >
+                  <EvilIcons name="plus" size={35} color="white" />
                 </TouchableOpacity>
-              )
+              ),
             }}
           />
-          <Stack.Screen component={ShowScreen} name="Show" />
+          <Stack.Screen
+            component={ShowScreen}
+            name="Show"
+            options={{
+              headerRight: () => (
+                <TouchableOpacity
+                  style={{ marginRight: 15 }}
+                  onPress={() => navigationRef.current.navigate("Edit")}
+                >
+                  <EvilIcons name="plus" size={35} color="white" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
           <Stack.Screen component={CreateScreen} name="Create" />
           <Stack.Screen component={EditScreen} name="Edit" />
         </Stack.Navigator>

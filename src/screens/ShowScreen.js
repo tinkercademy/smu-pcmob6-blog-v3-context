@@ -1,13 +1,23 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { commonStyles } from "../../styles/commonStyles";
+import React, { useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Context } from "../context/BlogContext";
+import { EvilIcons } from "@expo/vector-icons";
 
-export default function ShowScreen({ navigation }) {
+const ShowScreen = ({ navigation }) => {
+  const { state } = useContext(Context);
+
+  const blogPost = state.find(
+    (blogPost) => blogPost.id === navigation.getParam("id")
+  );
+
   return (
-    <View style={commonStyles.container}>
-      <Text>Show Screen</Text>
+    <View>
+      <Text>{blogPost.title}</Text>
+      <Text>{blogPost.content}</Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({});
+
+export default ShowScreen;
