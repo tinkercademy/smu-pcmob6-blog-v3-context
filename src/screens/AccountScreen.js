@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -11,15 +11,14 @@ import {
 import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import blog from "../api/blog";
-import { useTheme } from "../context/ThemeContext";
+import { Context as ThemeContext } from "../context/ThemeContext";
 
 export default function AccountScreen({ navigation }) {
   const [username, setUsername] = useState("");
-  const { colors, setScheme, isDark } = useTheme();
+  const { state, toggleTheme } = useContext(ThemeContext);
 
-  const toggleScheme = () => {
-    isDark ? setScheme("light") : setScheme("dark");
-  };
+  console.log("rendering authform");
+  console.log(state.colors);
 
   async function getUsername() {
     console.log("----- Getting Username -----");
@@ -63,28 +62,46 @@ export default function AccountScreen({ navigation }) {
     navigation.navigate("SignIn");
   }
 
-  const containerStyle = {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    /*
-     * the colors.background value will change dynamicly with
-     * so if we wanna change its value we can go directly to the pallet
-     * this will make super easy to change and maintain mid or end project
-     */
-    backgroundColor: colors.background,
-  };
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      /*
+       * the colors.background value will change dynamicly with
+       * so if we wanna change its value we can go directly to the pallet
+       * this will make super easy to change and maintain mid or end project
+       */
+      backgroundColor: state.colors.background,
+      borderColor: state.colors.border,
+    },
+    text: {
+      color: state.colors.text,
+    },
+  });
 
   return (
     <>
       <StatusBar
         animated
-        barStyle={isDark ? "light-content" : "dark-content"}
+        barStyle={state.isDark ? "light-content" : "dark-content"}
       />
-      <View style={containerStyle}>
-        <Text>Account Screen</Text>
-        <Text>{username}</Text>
-        <Switch value={isDark} onValueChange={toggleScheme} />
+      <View style={styles.container}>
+        <Text style={styles.text}>Account Screen</Text>
+        <Text style={styles.text}>{username}</Text>
+        <Switch
+          value={state.isDark}
+          onValueChange={() => {
+            toggleTheme(state.isDark);
+            navigation.setOptions({
+              headerStyle: {
+                backgroundColor: state.colors.primary,
+                height: 80,
+              },
+              headerTintColor: state.colors.text
+            });
+          }}
+        />
         <Button title="Sign out" onPress={signOut} />
       </View>
     </>
