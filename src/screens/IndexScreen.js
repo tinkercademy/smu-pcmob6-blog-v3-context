@@ -11,35 +11,12 @@ import { EvilIcons } from "@expo/vector-icons";
 import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import blog from "../api/blog";
+import { useUsername } from "../hooks/useAPI";
 
 const IndexScreen = ({ navigation }) => {
-  const { state, deleteBlogPost } = useContext(Context); // access BlogContext object
+  const { state, deleteBlogPost, getBlogPosts } = useContext(Context); // access BlogContext object
   const [username, setUsername] = useState("");
-
-  async function getUsername() {
-    console.log("----- Getting Username -----");
-    const token = await AsyncStorage.getItem("token");
-    console.log(`Token is ${token}`);
-
-    try {
-      const response = await blog.get("/whoami", { 
-        headers: { Authorization: `JWT ${token}` }
-      });
-      console.log("Got username!");
-
-      setUsername(response.data.username);
-      console.log(`Username is ${username}`);
-    } catch (error) {
-      console.log("Error getting username!");
-
-      if (error.response) {
-        console.log(error.response.data);
-        (error.response.data.status_code === 401) ? signOut() : null ;
-      } else {
-        console.log(error);
-      };
-    };
-  };
+  const getUsernameFromAPI = useUsername(signOut);
 
   useEffect(() => {
     console.log("----- Setting Up Nav Listener -----")
@@ -53,6 +30,21 @@ const IndexScreen = ({ navigation }) => {
     getUsername();
     return removeListener;
   }, []);
+
+  useEffect(() => {
+    getBlogPosts();
+
+    const listener = navigation.addListener("didFocus", () => {
+      getBlogPosts();
+    })
+    
+    return listener;
+  }, [])
+  
+  async function getUsername() {
+    const name = getUsernameFromAPI();
+    setUsername(name);
+  };
 
   function signOut() {
     AsyncStorage.removeItem("token");

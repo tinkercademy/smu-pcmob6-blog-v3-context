@@ -1,4 +1,5 @@
 import createDataContext from "./createDataContext";
+import blog from "../api/blog";
 
 const blogReducer = (state, action) => {
   // state === { data: object }
@@ -21,6 +22,8 @@ const blogReducer = (state, action) => {
       return state.map((blogPost) => {
         return blogPost.id === action.payload.id ? action.payload : blogPost;
       });
+    case "get_blogposts":
+      return action.payload;
     default:
       return state;
   }
@@ -29,8 +32,9 @@ const blogReducer = (state, action) => {
 // addBlogPost(dispatch) => {return () => dispatch(...)}
 // function returns a function that calls dispatch functions
 const addBlogPost = (dispatch) => {
-  return (title, content, callback) => {
-    dispatch({ type: "add_blogpost", payload: { title, content } });
+  return async (title, content, callback) => {
+    //dispatch({ type: "add_blogpost", payload: { title, content } });
+    await blog.post("/create", { title, content });
     if (callback) {
         callback();
     }
@@ -55,8 +59,15 @@ const editBlogPost = (dispatch) => {
   };
 };
 
+const getBlogPosts = (dispatch) => {
+  return async () => {
+    const response = await blog.get("/posts");
+    dispatch({ type: "get_blogposts", payload: response.data });
+  };
+};
+
 export const { Context, Provider } = createDataContext(
   blogReducer,
-  { addBlogPost, deleteBlogPost, editBlogPost },
+  { addBlogPost, deleteBlogPost, editBlogPost, getBlogPosts },
   [{ id: 1, title: "TEST POST", content: "TEST CONTENT" }]
 );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,22 +10,64 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import blog from "../api/blog";
 
-const AuthForm = ({
-  username,
-  password,
-  errorText,
-  loading,
-  formType,
-  signIn,
-  signUp,
-}) => {
-  const navigation = useNavigation();
+const AuthForm = ({ navigation, isSignIn }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorText, setErrorText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function signup() {
+    console.log("---- Signing up ----");
+    Keyboard.dismiss();
+
+    try {
+      setLoading(true);
+      await blog.post("/newuser", {
+        username,
+        password,
+      });
+      console.log("Success signing up!");
+      login();
+    } catch (error) {
+      setLoading(false);
+      console.log("Error signing up!");
+      console.log(error.response);
+      setErrorText(error.response.data.description);
+    }
+  }
+
+  async function login() {
+    console.log("---- Login time ----");
+    Keyboard.dismiss();
+
+    try {
+      setLoading(true);
+      const response = await blog.post("/auth", {
+        username,
+        password,
+      });
+      console.log("Success logging in!");
+      // console.log(response);
+      await AsyncStorage.setItem("token", response.data.access_token);
+      setLoading(false);
+      navigation.navigate("Index");
+    } catch (error) {
+      setLoading(false);
+      console.log("Error logging in!");
+      console.log(error);
+      setErrorText(error.response.data.description);
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.title}>{formType} to blog</Text>
+        <Text style={styles.title}>
+          {isSignIn ? "Log in to blog" : "Sign up for an account"}
+        </Text>
         <Text style={styles.fieldTitle}>Username</Text>
         <TextInput
           style={styles.input}
@@ -46,28 +88,31 @@ const AuthForm = ({
         />
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
-            onPress={formType === "Sign in" ? signIn : signUp}
+            onPress={isSignIn ? login : signup}
             style={styles.loginButton}
           >
-            <Text style={styles.buttonText}>{formType}</Text>
+            <Text style={styles.buttonText}>
+              {isSignIn ? "Log in" : "Sign up"}
+            </Text>
           </TouchableOpacity>
           {loading ? (
             <ActivityIndicator style={{ marginLeft: 20, marginBottom: 20 }} />
           ) : null}
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(isSignIn ? "SignUp" : "SignIn");
+          }}
+          style={styles.switchButton}
+        >
+          <Text style={styles.switchText}>
+            {isSignIn
+              ? "Register for a new account"
+              : "Have and account? Sign in"}
+          </Text>
+        </TouchableOpacity>
         <Text style={styles.errorText}>{errorText}</Text>
         <View style={{ height: 20, alignItems: "left" }}></View>
-        {signIn ? (
-          <Button
-            title="Sign up here"
-            onPress={() => navigation.navigate("SignUp")}
-          />
-        ) : (
-          <Button
-            title="Sign in instead"
-            onPress={() => navigation.navigate("SignIn")}
-          />
-        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -109,6 +154,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  switchText: {
+    color: "blue",
   },
   errorText: {
     color: "red",
