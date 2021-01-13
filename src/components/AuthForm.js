@@ -9,10 +9,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  Switch
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import blog from "../api/blog";
 import { useAuth } from "../hooks/useAPI";
+import { useTheme } from "../context/ThemeContext";
 
 const AuthForm = ({ navigation, isSignIn }) => {
   const [username, setUsername] = useState("");
@@ -25,9 +27,28 @@ const AuthForm = ({ navigation, isSignIn }) => {
     }
   );
 
+  const { colors, setScheme, isDark } = useTheme();
+
+  const toggleScheme = () => {
+    isDark ? setScheme("light") : setScheme("dark");
+  };
+
+  const containerStyle = {
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    /*
+     * the colors.background value will change dynamicly with
+     * so if we wanna change its value we can go directly to the pallet
+     * this will make super easy to change and maintain mid or end project
+     */
+    backgroundColor: colors.background,
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={containerStyle}>
+        <Switch value={isDark} onValueChange={toggleScheme} />
         <Text style={styles.title}>
           {isSignIn ? "Log in to blog" : "Sign up for an account"}
         </Text>
