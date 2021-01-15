@@ -4,7 +4,7 @@ import { useColorScheme } from "react-native-appearance";
 import { lightColors, darkColors } from "../../styles/colorThemes";
 import createDataContext from "./createDataContext";
 
-const ThemeReducer = (state, action) => {
+const ThemeReducer = (themeState, action) => {
     // state: { isDark, color, setScheme }
     // action: { type: "toggle_theme" || "default", payload: isDark === True || isDark === False }
     switch (action.type) {
@@ -15,7 +15,7 @@ const ThemeReducer = (state, action) => {
                 colors: !action.payload.isDark ? DarkTheme.colors : DefaultTheme.colors,
             };
         case "default":
-            return state;
+            return themeState;
     }
 }
 
