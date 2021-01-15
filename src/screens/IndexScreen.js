@@ -10,41 +10,32 @@ import { Context } from "../context/BlogContext";
 import { EvilIcons } from "@expo/vector-icons";
 import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import blog from "../api/blog";
 import { useUsername } from "../hooks/useAPI";
 
 const IndexScreen = ({ navigation }) => {
   const { state, deleteBlogPost, getBlogPosts } = useContext(Context); // access BlogContext object
-  const [username, setUsername] = useState("");
-  const getUsernameFromAPI = useUsername(signOut);
+  const [username, loading, error, refresh] = useUsername();
 
   useEffect(() => {
-    console.log("----- Setting Up Nav Listener -----")
+    if (error) {
+      signOut();
+    }
+  }, [error]);
 
+  useEffect(() => {
     const removeListener = navigation.addListener("focus", () => {
-      console.log("Running Nav Listener");
-      setUsername("");
-      getUsername();
+      refresh(true);
     });
-
-    getUsername();
     return removeListener;
   }, []);
 
   useEffect(() => {
     getBlogPosts();
-
     const listener = navigation.addListener("didFocus", () => {
       getBlogPosts();
-    })
-    
+    });
     return listener;
-  }, [])
-  
-  async function getUsername() {
-    const name = getUsernameFromAPI();
-    setUsername(name);
-  };
+  }, []);
 
   function signOut() {
     AsyncStorage.removeItem("token");

@@ -12,48 +12,26 @@ import { commonStyles } from "../../styles/commonStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import blog from "../api/blog";
 import { Context as ThemeContext } from "../context/ThemeContext";
+import { useUsername } from "../hooks/useAPI";
 
 export default function AccountScreen({ navigation }) {
-  const [username, setUsername] = useState("");
+  const [username, loading, error, refresh] = useUsername();
   const { state, toggleTheme } = useContext(ThemeContext);
+
+  useEffect(() => {
+    if (error) {
+      signOut();
+    }
+  }, [error]);
 
   console.log("rendering authform");
   console.log(state.colors);
 
-  async function getUsername() {
-    console.log("----- Getting Username -----");
-    const token = await AsyncStorage.getItem("token");
-    console.log(`Token is ${token}`);
-
-    try {
-      const response = await blog.get("/whoami", {
-        headers: { Authorization: `JWT ${token}` },
-      });
-      console.log("Got username!");
-      setUsername(response.data.username);
-      console.log(`Username is ${username}`);
-    } catch (error) {
-      console.log("Error getting username!");
-      if (error.response) {
-        console.log(error.response.data);
-        error.response.data.status_code === 401 ? signOut() : null;
-      } else {
-        console.log(error);
-      }
-    }
-  }
-
   useEffect(() => {
-    console.log("Setting up nav listener!");
-
     // Check for when we come back to this screen
     const removeListener = navigation.addListener("focus", () => {
-      console.log("Running nav listener!");
-      setUsername(<ActivityIndicator />);
-      getUsername();
+      refresh(true);
     });
-    getUsername();
-
     return removeListener;
   }, []);
 
@@ -88,7 +66,11 @@ export default function AccountScreen({ navigation }) {
       />
       <View style={styles.container}>
         <Text style={styles.text}>Account Screen</Text>
-        <Text style={styles.text}>{username}</Text>
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text style={styles.text}>{username}</Text>
+        )}
         <Switch
           value={state.isDark}
           onValueChange={() => {
@@ -98,7 +80,7 @@ export default function AccountScreen({ navigation }) {
                 backgroundColor: state.colors.primary,
                 height: 80,
               },
-              headerTintColor: state.colors.text
+              headerTintColor: state.colors.text,
             });
           }}
         />

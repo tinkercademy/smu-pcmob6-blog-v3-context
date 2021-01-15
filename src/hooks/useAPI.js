@@ -1,42 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import blog from "../api/blog";
 
 export function useUsername(signoutCallback) {
-  async function getUsername() {
-    console.log("---- Getting user name ----");
-    const token = await AsyncStorage.getItem("token");
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
-    if (token == null) {
-      console.log("User not signed in. Redirecting to Sign In page.");
-      signoutCallback();
-      return null;
-    }
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
 
-    console.log(`Token is ${token}`);
+      const token = await AsyncStorage.getItem("token");
+      console.log(`Token is ${token}`);
 
-    try {
-      const response = await blog.get("/whoami", {
-        headers: { Authorization: `JWT ${token}` },
-      });
-      console.log("Got user name!");
-      return response.data.username;
-    } catch (error) {
-      console.log("Error getting user name");
-      if (error.response) {
-        console.log(error.response.data);
-        if (error.response.data.status_code === 401) {
-          signoutCallback();
-          return null;
-        }
+      if (token == null) {
+        setError(true);
+        setUsername(null);
       } else {
-        console.log(error);
+        try {
+          const response = await blog.get("/whoami", {
+            headers: { Authorization: `JWT ${token}` },
+          });
+          setUsername(response.data.username);
+          setLoading(false);
+        } catch (e) {
+          setError(true);
+          setUsername(null);
+          setLoading(false);
+        }
       }
-      return null;
-    }
-  }
+    })();
+    setRefresh(false);
+  }, [refresh]);
 
-  return getUsername;
+  return [username, loading, error, setRefresh];
 }
 
 export function useAuth(username, password, navigationCallback) {

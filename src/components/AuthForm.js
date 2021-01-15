@@ -23,7 +23,7 @@ const AuthForm = ({ navigation, isSignIn }) => {
     username,
     password,
     () => {
-      navigation.navigate("Account");
+      navigation.navigate("TabStack");
     }
   );
   const { state, toggleTheme } = useContext(ThemeContext);
@@ -35,10 +35,6 @@ const AuthForm = ({ navigation, isSignIn }) => {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <Switch
-            value={state.isDark}
-            onValueChange={() => toggleTheme(state.isDark)}
-          />
           <Text style={styles.title}>
             {isSignIn ? "Log in to blog" : "Sign up for an account"}
           </Text>
