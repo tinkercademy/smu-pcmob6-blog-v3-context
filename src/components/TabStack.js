@@ -14,6 +14,7 @@ import EditScreen from "../screens/EditScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { EvilIcons } from "@expo/vector-icons";
+import { navigationRef } from "../../navigation/RootNavigation";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,7 +31,7 @@ function BlogStack() {
               style={{ marginRight: 15 }}
               onPress={() => navigationRef.current.navigate("Create")}
             >
-              <EvilIcons name="plus" size={35} color="white" />
+              <EvilIcons name="plus" size={35} color="black" />
             </TouchableOpacity>
           ),
         }}
@@ -48,7 +49,7 @@ function BlogStack() {
                 });
               }}
             >
-              <EvilIcons name="pencil" size={35} color="white" />
+              <EvilIcons name="pencil" size={35} color="black" />
             </TouchableOpacity>
           ),
         }}

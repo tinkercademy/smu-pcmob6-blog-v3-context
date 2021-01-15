@@ -61,7 +61,7 @@ export default function App() {
               animationEnabled: false
             }}
           >
-            <Stack.Screen component={TabStack} name="TabStack" />
+            <Stack.Screen component={TabStack} name="TabStack"/>
             <Stack.Screen component={SignInScreen} name="SignIn" />
             <Stack.Screen component={SignUpScreen} name="SignUp" />
           </Stack.Navigator>
